@@ -2,7 +2,7 @@
  * Storage二次封装
  * @author swanine
  */
-import config from './../config/index'
+import config from '@/config/index'
 export default {
   setItem(key, value) {
     let storage = this.getStorage()
