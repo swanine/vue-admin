@@ -2,9 +2,9 @@
  * axios二次封装
  */
 import axios from 'axios'
-import config from './../config'
+import config from '@/config'
 import { ElMessage } from 'element-plus'
-import router from './../router/index'
+import router from '@/router/index'
 const TOKEN_INVALID = '认证失效，请重新登录'
 const NETWORK_ERROR = '网络异常，请稍后重试'
 
@@ -22,21 +22,20 @@ service.interceptors.request.use((req) => {
   return req
 })
 
-//响应拦截
-service.interceptors.request.use((req) => {
-  //To-DO
-  const { code, data, msg } = res.data
-  if (code === 0) {
-    return data
-  } else if (code === 40001) {
-    ElMessage.error(TOKEN_INVALID)
-    setTimeout(() => {
-      router.push('/login')
-    },2000)
-    return Promise.reject(TOKEN_INVALID)
+// 响应拦截
+service.interceptors.response.use((res) => {
+  const { code, data, msg } = res.data;
+  if (code === 200) {
+      return data;
+  } else if (code === 500001) {
+      ElMessage.error(TOKEN_INVALID)
+      setTimeout(() => {
+          router.push('/login')
+      }, 1500)
+      return Promise.reject(TOKEN_INVALID)
   } else {
-    ElMessage.error(msg || NETWORK_ERROR)
-    return Promise.reject(msg || NETWORK_ERROR)
+      ElMessage.error(msg || NETWORK_ERROR)
+      return Promise.reject(msg || NETWORK_ERROR)
   }
 })
 /**
