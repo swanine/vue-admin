@@ -1,12 +1,12 @@
 <template>
   <div class="login-wrapper">
-    <form>
+    <form :model="user">
       <div class="title">
         <h1>登&emsp;录</h1>
       </div>
-      <input type="text" placeholder="用户名">
-      <input type="password" placeholder="密码">
-      <button type="submit">Login</button>
+      <input type="text" placeholder="用户名" v-model="user.userName">
+      <input type="password" placeholder="密码" v-model="user.userPwd">
+      <button @click="login">Login</button>
     </form>
   </div>
 </template>
@@ -15,73 +15,19 @@
 export default {
   name: 'Login',
   data() {
-    var checkAge = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('年龄不能为空'));
-      }
-      setTimeout(() => {
-        if (!Number.isInteger(value)) {
-          callback(new Error('请输入数字值'));
-        } else {
-          if (value < 18) {
-            callback(new Error('必须年满18岁'));
-          } else {
-            callback();
-          }
-        }
-      }, 1000);
-    };
-    var validatePass = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请输入密码'));
-      } else {
-        if (this.ruleForm.checkPass !== '') {
-          this.$refs.ruleForm.validateField('checkPass');
-        }
-        callback();
-      }
-    };
-    var validatePass2 = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请再次输入密码'));
-      } else if (value !== this.ruleForm.pass) {
-        callback(new Error('两次输入密码不一致!'));
-      } else {
-        callback();
-      }
-    };
     return {
-      ruleForm: {
-        pass: '',
-        checkPass: '',
-        age: ''
-      },
-      rules: {
-        pass: [
-          { validator: validatePass, trigger: 'blur' }
-        ],
-        checkPass: [
-          { validator: validatePass2, trigger: 'blur' }
-        ],
-        age: [
-          { validator: checkAge, trigger: 'blur' }
-        ]
+      user: {
+        userName: 'admin',
+        userPwd: '123456'
       }
     };
   },
   methods: {
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          alert('submit!');
-        } else {
-          console.log('error submit!!');
-          return false;
-        }
-      });
-    },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
+    login(){
+      this.$api.login(this.user).then((res) => {
+        this.$store.commit('saveUserInfo', res)
+        this.$router.push('/welcome')
+      })
     }
   }
 }
@@ -153,14 +99,16 @@ background-image: linear-gradient(-225deg, #FFE29F 0%, #FFA99F 48%, #FF719A 100%
     input{
       width: 100%;
       height: 50px;
+      padding: 5px 10px;
       border-radius: 8px;
       background-color: transparent;
       border: 1px solid rgba(255, 255, 255, .5);
       margin-bottom: 15px;
+      font-size: 16px;
       color: #fff;
       outline: none;
       &::placeholder{
-        color: #fff;
+        color: rgba(255, 255, 255, 0.5);
       }
     }
     button{
